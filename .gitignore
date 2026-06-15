@@ -1,0 +1,13 @@
+# secrets
+.env
+config.yaml          # local copy with real endpoints; share config.example.yaml
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db

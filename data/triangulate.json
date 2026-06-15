@@ -1,0 +1,346 @@
+{
+  "pages": [
+    "anaheim_gazette_1941_ag_1941_03_27|0",
+    "anaheim_gazette_1941_ag_1941_03_27|1",
+    "anaheim_gazette_1943_ag_1943_04_05|0",
+    "anaheim_gazette_1943_ag_1943_04_05|1",
+    "anaheim_gazette_1945_ag_1945_03_29|0",
+    "anaheim_gazette_1945_ag_1945_03_29|1",
+    "anaheim_gazette_1947_ag_1947_03_27|0",
+    "anaheim_gazette_1947_ag_1947_03_27|1",
+    "anaheim_gazette_1949_ag_1949_03_31|0",
+    "anaheim_gazette_1949_ag_1949_03_31|1"
+  ],
+  "models": [
+    {
+      "model": "qwen25vl-72b",
+      "coverage": "10/10",
+      "f1_cons": 0.9273441181150991,
+      "f1_sd": 0.04518535998028815,
+      "f1_min": 0.8462477948161217,
+      "recall_cons": 0.8818192422086363,
+      "digit_recall": 0.827003991627966,
+      "rare_recall": 0.8565685200851586,
+      "phrase_recovery": 0.873599540361965,
+      "per_ref": {
+        "reference-claude": 0.9233721008608867,
+        "reference-gpt": 0.9127037774053082,
+        "reference-gemini": 0.8263537817298946
+      },
+      "per_page_f1": {
+        "anaheim_gazette_1941_ag_1941_03_27|0": 0.9563623028969563,
+        "anaheim_gazette_1941_ag_1941_03_27|1": 0.9737553068313393,
+        "anaheim_gazette_1943_ag_1943_04_05|0": 0.9586980920314254,
+        "anaheim_gazette_1943_ag_1943_04_05|1": 0.911812806642345,
+        "anaheim_gazette_1945_ag_1945_03_29|0": 0.9359877488514547,
+        "anaheim_gazette_1945_ag_1945_03_29|1": 0.9519650655021833,
+        "anaheim_gazette_1947_ag_1947_03_27|0": 0.9455568784500488,
+        "anaheim_gazette_1947_ag_1947_03_27|1": 0.8482235253535703,
+        "anaheim_gazette_1949_ag_1949_03_31|0": 0.9448316597755463,
+        "anaheim_gazette_1949_ag_1949_03_31|1": 0.8462477948161217
+      },
+      "leader_wins": 0,
+      "leader_mean_diff": 0.0
+    },
+    {
+      "model": "glm-ocr",
+      "coverage": "10/10",
+      "f1_cons": 0.8532474906946075,
+      "f1_sd": 0.03718551391461667,
+      "f1_min": 0.7832013262110885,
+      "recall_cons": 0.935190834867524,
+      "digit_recall": 0.8757015494998416,
+      "rare_recall": 0.870579290254875,
+      "phrase_recovery": 0.8299339270324619,
+      "per_ref": {
+        "reference-claude": 0.8486137236777836,
+        "reference-gpt": 0.843718109801972,
+        "reference-gemini": 0.7578370701222177
+      },
+      "per_page_f1": {
+        "anaheim_gazette_1941_ag_1941_03_27|0": 0.849989113868931,
+        "anaheim_gazette_1941_ag_1941_03_27|1": 0.890473578350704,
+        "anaheim_gazette_1943_ag_1943_04_05|0": 0.7832013262110885,
+        "anaheim_gazette_1943_ag_1943_04_05|1": 0.8248530306101763,
+        "anaheim_gazette_1945_ag_1945_03_29|0": 0.8791766907244052,
+        "anaheim_gazette_1945_ag_1945_03_29|1": 0.8637120959680107,
+        "anaheim_gazette_1947_ag_1947_03_27|0": 0.8136300417246175,
+        "anaheim_gazette_1947_ag_1947_03_27|1": 0.8589006285943561,
+        "anaheim_gazette_1949_ag_1949_03_31|0": 0.9069377723159423,
+        "anaheim_gazette_1949_ag_1949_03_31|1": 0.8616006285778427
+      },
+      "leader_wins": 8,
+      "leader_mean_diff": 0.07409662742049168
+    },
+    {
+      "model": "qwen3vl-32b",
+      "coverage": "10/10",
+      "f1_cons": 0.8351729399747087,
+      "f1_sd": 0.19698046699041427,
+      "f1_min": 0.390371782650143,
+      "recall_cons": 0.8393474773686588,
+      "digit_recall": 0.6912437491739194,
+      "rare_recall": 0.7444406923762116,
+      "phrase_recovery": 0.7454754380925022,
+      "per_ref": {
+        "reference-claude": 0.8311805920840303,
+        "reference-gpt": 0.8321020936821052,
+        "reference-gemini": 0.7184381213675282
+      },
+      "per_page_f1": {
+        "anaheim_gazette_1941_ag_1941_03_27|0": 0.9151263674085252,
+        "anaheim_gazette_1941_ag_1941_03_27|1": 0.9513406156901688,
+        "anaheim_gazette_1943_ag_1943_04_05|0": 0.9004635276896805,
+        "anaheim_gazette_1943_ag_1943_04_05|1": 0.9509605059062163,
+        "anaheim_gazette_1945_ag_1945_03_29|0": 0.390371782650143,
+        "anaheim_gazette_1945_ag_1945_03_29|1": 0.917732457656412,
+        "anaheim_gazette_1947_ag_1947_03_27|0": 0.5515473704195937,
+        "anaheim_gazette_1947_ag_1947_03_27|1": 0.9615562760537286,
+        "anaheim_gazette_1949_ag_1949_03_31|0": 0.9213456804595005,
+        "anaheim_gazette_1949_ag_1949_03_31|1": 0.8912848158131177
+      },
+      "leader_wins": 7,
+      "leader_mean_diff": 0.09217117814039048
+    },
+    {
+      "model": "hunyuan-ocr",
+      "coverage": "10/10",
+      "f1_cons": 0.8149494947723447,
+      "f1_sd": 0.04473526859489232,
+      "f1_min": 0.7298040258934114,
+      "recall_cons": 0.9042901523609892,
+      "digit_recall": 0.8637099724585549,
+      "rare_recall": 0.8082717441708992,
+      "phrase_recovery": 0.77391554151106,
+      "per_ref": {
+        "reference-claude": 0.8090955065149753,
+        "reference-gpt": 0.8049247333964853,
+        "reference-gemini": 0.730564455799183
+      },
+      "per_page_f1": {
+        "anaheim_gazette_1941_ag_1941_03_27|0": 0.8587958002999787,
+        "anaheim_gazette_1941_ag_1941_03_27|1": 0.830010873504893,
+        "anaheim_gazette_1943_ag_1943_04_05|0": 0.8675968992248062,
+        "anaheim_gazette_1943_ag_1943_04_05|1": 0.8301452911048395,
+        "anaheim_gazette_1945_ag_1945_03_29|0": 0.8433056872037915,
+        "anaheim_gazette_1945_ag_1945_03_29|1": 0.8220172387721155,
+        "anaheim_gazette_1947_ag_1947_03_27|0": 0.7473032714412026,
+        "anaheim_gazette_1947_ag_1947_03_27|1": 0.802030456852792,
+        "anaheim_gazette_1949_ag_1949_03_31|0": 0.7298040258934114,
+        "anaheim_gazette_1949_ag_1949_03_31|1": 0.8184854034256167
+      },
+      "leader_wins": 10,
+      "leader_mean_diff": 0.1123946233427544
+    },
+    {
+      "model": "qwen3vl-32b-tiled",
+      "coverage": "10/10",
+      "f1_cons": 0.8040891048793861,
+      "f1_sd": 0.022227884372144804,
+      "f1_min": 0.7699763593380615,
+      "recall_cons": 0.9904352803474886,
+      "digit_recall": 0.948092070096901,
+      "rare_recall": 0.9402055943100378,
+      "phrase_recovery": 0.9258833668486067,
+      "per_ref": {
+        "reference-claude": 0.7971217233245691,
+        "reference-gpt": 0.8016725320597936,
+        "reference-gemini": 0.7192141535599721
+      },
+      "per_page_f1": {
+        "anaheim_gazette_1941_ag_1941_03_27|0": 0.7958313595452393,
+        "anaheim_gazette_1941_ag_1941_03_27|1": 0.8019567618747041,
+        "anaheim_gazette_1943_ag_1943_04_05|0": 0.8107360265633647,
+        "anaheim_gazette_1943_ag_1943_04_05|1": 0.8128933816517261,
+        "anaheim_gazette_1945_ag_1945_03_29|0": 0.8058608058608059,
+        "anaheim_gazette_1945_ag_1945_03_29|1": 0.7947395564724085,
+        "anaheim_gazette_1947_ag_1947_03_27|0": 0.8231665524331734,
+        "anaheim_gazette_1947_ag_1947_03_27|1": 0.7699763593380615,
+        "anaheim_gazette_1949_ag_1949_03_31|0": 0.8480791618160652,
+        "anaheim_gazette_1949_ag_1949_03_31|1": 0.7776510832383123
+      },
+      "leader_wins": 10,
+      "leader_mean_diff": 0.123255013235713
+    },
+    {
+      "model": "paddleocr-vl",
+      "coverage": "10/10",
+      "f1_cons": 0.7773187651404291,
+      "f1_sd": 0.09791448026557302,
+      "f1_min": 0.6178665053438194,
+      "recall_cons": 0.824577826262739,
+      "digit_recall": 0.7305266527279513,
+      "rare_recall": 0.7148242312956019,
+      "phrase_recovery": 0.6923297902901465,
+      "per_ref": {
+        "reference-claude": 0.7749429539523616,
+        "reference-gpt": 0.7670866090075537,
+        "reference-gemini": 0.6915055205709597
+      },
+      "per_page_f1": {
+        "anaheim_gazette_1941_ag_1941_03_27|0": 0.6178665053438194,
+        "anaheim_gazette_1941_ag_1941_03_27|1": 0.8476539872562271,
+        "anaheim_gazette_1943_ag_1943_04_05|0": 0.9021664766248574,
+        "anaheim_gazette_1943_ag_1943_04_05|1": 0.7143607521798508,
+        "anaheim_gazette_1945_ag_1945_03_29|0": 0.635691397584422,
+        "anaheim_gazette_1945_ag_1945_03_29|1": 0.8308466051969824,
+        "anaheim_gazette_1947_ag_1947_03_27|0": 0.7685456937556928,
+        "anaheim_gazette_1947_ag_1947_03_27|1": 0.7788153681963713,
+        "anaheim_gazette_1949_ag_1949_03_31|0": 0.8926756985605421,
+        "anaheim_gazette_1949_ag_1949_03_31|1": 0.7845651667055258
+      },
+      "leader_wins": 10,
+      "leader_mean_diff": 0.15002535297467
+    },
+    {
+      "model": "olmocr2-7b",
+      "coverage": "10/10",
+      "f1_cons": 0.7229063729412538,
+      "f1_sd": 0.24160897766687348,
+      "f1_min": 0.15203145478374838,
+      "recall_cons": 0.7024771731348053,
+      "digit_recall": 0.6163726012442241,
+      "rare_recall": 0.5619716037010483,
+      "phrase_recovery": 0.5983912668773341,
+      "per_ref": {
+        "reference-claude": 0.7209964575019743,
+        "reference-gpt": 0.7143171304605729,
+        "reference-gemini": 0.6351270846814362
+      },
+      "per_page_f1": {
+        "anaheim_gazette_1941_ag_1941_03_27|0": 0.83440916875247,
+        "anaheim_gazette_1941_ag_1941_03_27|1": 0.924167815639157,
+        "anaheim_gazette_1943_ag_1943_04_05|0": 0.8796458114878248,
+        "anaheim_gazette_1943_ag_1943_04_05|1": 0.4422632794457275,
+        "anaheim_gazette_1945_ag_1945_03_29|0": 0.8455813953488373,
+        "anaheim_gazette_1945_ag_1945_03_29|1": 0.15203145478374838,
+        "anaheim_gazette_1947_ag_1947_03_27|0": 0.7923040152963672,
+        "anaheim_gazette_1947_ag_1947_03_27|1": 0.7915332621842761,
+        "anaheim_gazette_1949_ag_1949_03_31|0": 0.8586490131175677,
+        "anaheim_gazette_1949_ag_1949_03_31|1": 0.7084785133565622
+      },
+      "leader_wins": 10,
+      "leader_mean_diff": 0.2044377451738453
+    },
+    {
+      "model": "dots-ocr",
+      "coverage": "9/10",
+      "f1_cons": 0.6986397666293097,
+      "f1_sd": 0.29837334739506294,
+      "f1_min": 0.0,
+      "recall_cons": 0.6244138969972026,
+      "digit_recall": 0.4780875051471868,
+      "rare_recall": 0.5552349715121209,
+      "phrase_recovery": 0.5127836828497558,
+      "per_ref": {
+        "reference-claude": 0.699431847707869,
+        "reference-gpt": 0.6883909352765551,
+        "reference-gemini": 0.5918773319374474
+      },
+      "per_page_f1": {
+        "anaheim_gazette_1941_ag_1941_03_27|0": 0.8928571428571428,
+        "anaheim_gazette_1941_ag_1941_03_27|1": 0.8172188415596124,
+        "anaheim_gazette_1943_ag_1943_04_05|0": 0.0,
+        "anaheim_gazette_1943_ag_1943_04_05|1": 0.7232558139534884,
+        "anaheim_gazette_1945_ag_1945_03_29|0": 0.9621669365523332,
+        "anaheim_gazette_1945_ag_1945_03_29|1": 0.9098596313208186,
+        "anaheim_gazette_1947_ag_1947_03_27|0": 0.4319948186528497,
+        "anaheim_gazette_1947_ag_1947_03_27|1": 0.9497985745274248,
+        "anaheim_gazette_1949_ag_1949_03_31|0": 0.711707810018767,
+        "anaheim_gazette_1949_ag_1949_03_31|1": 0.5875380968506604
+      },
+      "leader_wins": 8,
+      "leader_mean_diff": 0.22870435148578938
+    },
+    {
+      "model": "paddleocr-vl-15",
+      "coverage": "10/10",
+      "f1_cons": 0.6121338227061386,
+      "f1_sd": 0.0885627253693272,
+      "f1_min": 0.4869565217391304,
+      "recall_cons": 0.5632971602601694,
+      "digit_recall": 0.5926040239174449,
+      "rare_recall": 0.45473514364748663,
+      "phrase_recovery": 0.39672507900028725,
+      "per_ref": {
+        "reference-claude": 0.6111060097652634,
+        "reference-gpt": 0.6043565637454729,
+        "reference-gemini": 0.5516134404052533
+      },
+      "per_page_f1": {
+        "anaheim_gazette_1941_ag_1941_03_27|0": 0.674893945237177,
+        "anaheim_gazette_1941_ag_1941_03_27|1": 0.705097502565857,
+        "anaheim_gazette_1943_ag_1943_04_05|0": 0.728087431693989,
+        "anaheim_gazette_1943_ag_1943_04_05|1": 0.6390468453831573,
+        "anaheim_gazette_1945_ag_1945_03_29|0": 0.6165110745011898,
+        "anaheim_gazette_1945_ag_1945_03_29|1": 0.6820231958762886,
+        "anaheim_gazette_1947_ag_1947_03_27|0": 0.4869565217391304,
+        "anaheim_gazette_1947_ag_1947_03_27|1": 0.5663373323923782,
+        "anaheim_gazette_1949_ag_1949_03_31|0": 0.4913076341647771,
+        "anaheim_gazette_1949_ag_1949_03_31|1": 0.5310767435074409
+      },
+      "leader_wins": 10,
+      "leader_mean_diff": 0.31521029540896056
+    },
+    {
+      "model": "paddleocr-vl-16",
+      "coverage": "10/10",
+      "f1_cons": 0.6049451795760747,
+      "f1_sd": 0.07309080346842883,
+      "f1_min": 0.4776246023329799,
+      "recall_cons": 0.7699868142806594,
+      "digit_recall": 0.6823132526135789,
+      "rare_recall": 0.5691021551634561,
+      "phrase_recovery": 0.5096236713588049,
+      "per_ref": {
+        "reference-claude": 0.6002555045108315,
+        "reference-gpt": 0.59842315272937,
+        "reference-gemini": 0.5573961581301489
+      },
+      "per_page_f1": {
+        "anaheim_gazette_1941_ag_1941_03_27|0": 0.6166312164489011,
+        "anaheim_gazette_1941_ag_1941_03_27|1": 0.6298091487428051,
+        "anaheim_gazette_1943_ag_1943_04_05|0": 0.6766770670826833,
+        "anaheim_gazette_1943_ag_1943_04_05|1": 0.5550682261208577,
+        "anaheim_gazette_1945_ag_1945_03_29|0": 0.7468678431900848,
+        "anaheim_gazette_1945_ag_1945_03_29|1": 0.5884626000552029,
+        "anaheim_gazette_1947_ag_1947_03_27|0": 0.6222430052217286,
+        "anaheim_gazette_1947_ag_1947_03_27|1": 0.4776246023329799,
+        "anaheim_gazette_1949_ag_1949_03_31|0": 0.5633378016085792,
+        "anaheim_gazette_1949_ag_1949_03_31|1": 0.5727302849569251
+      },
+      "leader_wins": 10,
+      "leader_mean_diff": 0.32239893853902435
+    },
+    {
+      "model": "glm46v-flash",
+      "coverage": "10/10",
+      "f1_cons": 0.4158301285121951,
+      "f1_sd": 0.02463524719249644,
+      "f1_min": 0.3809760337762324,
+      "recall_cons": 0.9822193538234552,
+      "digit_recall": 0.9688830403310777,
+      "rare_recall": 0.9343578687545522,
+      "phrase_recovery": 0.8833668486067222,
+      "per_ref": {
+        "reference-claude": 0.41222243680842974,
+        "reference-gpt": 0.41283866802731506,
+        "reference-gemini": 0.3795444422198443
+      },
+      "per_page_f1": {
+        "anaheim_gazette_1941_ag_1941_03_27|0": 0.41137385186632797,
+        "anaheim_gazette_1941_ag_1941_03_27|1": 0.4041590602428765,
+        "anaheim_gazette_1943_ag_1943_04_05|0": 0.4217767295597485,
+        "anaheim_gazette_1943_ag_1943_04_05|1": 0.4120070629782225,
+        "anaheim_gazette_1945_ag_1945_03_29|0": 0.41731654897144616,
+        "anaheim_gazette_1945_ag_1945_03_29|1": 0.3809760337762324,
+        "anaheim_gazette_1947_ag_1947_03_27|0": 0.44451780240509314,
+        "anaheim_gazette_1947_ag_1947_03_27|1": 0.3965835074351727,
+        "anaheim_gazette_1949_ag_1949_03_31|0": 0.46740069084628666,
+        "anaheim_gazette_1949_ag_1949_03_31|1": 0.40218999704054453
+      },
+      "leader_wins": 10,
+      "leader_mean_diff": 0.5115139896029041
+    }
+  ]
+}

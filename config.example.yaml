@@ -1,0 +1,369 @@
+# YoreAnaheim OCR + Search — configuration
+#
+# vLLM serves each OCR model in WSL2 (see serve/vllm_commands.md).
+# This file tells the Windows/WSL pipeline where each endpoint lives and
+# how to prompt it. Add/remove models freely; the benchmark runs whatever
+# is listed under `models:` and is currently reachable.
+
+paths:
+  pdf_root: dl-c6e6b6c1de78  # FULL corpus (7,390 PDFs / 53k pages); the old
+                             # 482-PDF Gazette sample remains in data/pdfs —
+                             # same rel-paths, so issue_ids are unchanged
+  pages_web: data/pages_web  # downscaled JPEGs for the web view (~1 MB/page;
+                             # written during OCR + on first view)
+
+  pages: data/pages          # cached rendered page PNGs
+  ocr: data/ocr              # per-model OCR output (data/ocr/<model>/<issue>/pNNN.json)
+  bench: data/bench          # benchmark results
+  index: data/index/yore.db  # SQLite FTS5 search index
+
+render:
+  dpi: 300                   # render DPI for OCR (newsprint benefits from 300+)
+  fmt: png
+  web_jpeg: {max_side: 2000, quality: 85}   # web-view cache (see paths.pages_web)
+
+# Pages used for the benchmark. Chosen to span years and condition.
+# Edit after extraction if you want a different sample.
+benchmark_sample:
+  - anaheim-gazette/1941/ag-1941-03-27.pdf
+  - anaheim-gazette/1943/ag-1943-04-05.pdf
+  - anaheim-gazette/1945/ag-1945-03-29.pdf
+  - anaheim-gazette/1947/ag-1947-03-27.pdf
+  - anaheim-gazette/1949/ag-1949-03-31.pdf
+benchmark_pages_per_pdf: 2   # OCR the first N pages of each sample PDF
+
+# Stratified PILOT sample over the FULL corpus (dl-c6e6b6c1de78) — validates the
+# 1941-49 winner out-of-distribution before the 2-GPU-day full run. Spans every
+# decade with material, all four papers, clippings, and interior pages.
+# Run:  python scripts/benchmark.py --sample-key pilot_sample --pdf-root dl-c6e6b6c1de78
+pilot_sample:
+  - anaheim-gazette/1872/sc-1872-02-17.pdf      # oldest typography
+  - anaheim-gazette/1885/ag-1885-12-12.pdf
+  - anaheim-gazette/1898/ag-1898-01-20.pdf
+  - anaheim-gazette/1908/ag-1908-10-15.pdf
+  - anaheim-gazette/1918/ag-1918-05-23.pdf
+  - anaheim-gazette/1924/ag-1924-08-28.pdf      # heaviest decade in the corpus
+  - anaheim-gazette/1933/ag-1933-08-17.pdf
+  - anaheim-gazette/1955/ag-1955-05-05.pdf      # 2nd-heaviest decade
+  - anaheim-gazette/1964/ag-1964-01-09.pdf
+  - oc-plain-dealer/1921/ocpd-1921-08-24.pdf    # other broadsheet
+  - anaheim-daily-herald/1921/adh-1921-05-02.pdf
+  - {path: anaheim-bulletin/1959/ab-1959-05-06.pdf, pages: [4, 10]}  # INTERIOR pages
+  - {path: "halloween/Original Articles/1925-10-07 -- LAT - Plan Halloween Fete.pdf", pages: [0]}
+  - {path: "halloween/Original Articles/1928-11-02 -- LAT - Anaheim Proves Gracious Host at City's Frolic.pdf", pages: [0]}
+  - {path: "halloween/Original Articles/1929-10-09 -- LAT - Anaheim Stages Annual Party.pdf", pages: [0]}
+
+# Degeneration guard for the full-corpus run (scripts/ocr_run.py): the benchmark
+# showed these models can silently repetition-loop. Healthy newsprint OCR has a
+# dict rate ~0.8+; below min_dict_rate (with enough words to judge) the page is
+# retried once with stronger penalties and flagged either way.
+ocr_guard:
+  enabled: true
+  retry: true
+  min_dict_rate: 0.5
+  min_words: 30
+  max_repeat_run: 10   # >=10 consecutive repeats of a 1-3 word phrase = loop
+
+# Tier-3 "reading copy": when a user clicks "fine transcript" on a page view,
+# the webapp OCRs that one page with this model (full-page, high precision) and
+# caches it under data/ocr/<model>/ like any pipeline output. qwen3vl-32b fits
+# GPU 1 alone; switch to qwen25vl-72b (best transcripts, F1 0.927) when both
+# GPUs are free.
+reading_model: qwen3vl-32b
+
+# Per-paper routing for the full corpus.
+corpus_routing:
+  skip_papers: [sanborn]      # fire-insurance MAPS — no running text; OCRing
+                              # them with a newspaper prompt yields junk
+  prompt_overrides:
+    halloween: |
+      You are an OCR engine for a clipped newspaper article scan. Transcribe
+      ALL legible text exactly as printed, top-to-bottom. Output plain text
+      only — no commentary, no markdown fences.
+
+# The OCR models to serve & benchmark. `mode: vlm_chat` = OpenAI-compatible
+# /chat/completions with an image. `mode: mineru` = MinerU CLI/HTTP toolchain.
+#
+# Ports use the GPU-1 test range (4002+) per the the GPU host vLLM setup; each model
+# is served on GPU 1 so the production GLM on GPU 0 is undisturbed. Auth: the
+# client sends Bearer $VLLM_API_KEY automatically (set it in the environment).
+# `max_side` downscales the long edge before upload — newsprint at 300 DPI is
+# ~4100 px tall (~13 MP); 3000 keeps small type legible while cutting payload.
+models:
+  paddleocr-vl:
+    mode: vlm_chat
+    base_url: http://localhost:4002/v1
+    model: PaddleOCR-VL                 # --served-model-name (basename of HF repo)
+    max_side: 3000
+    image_fmt: JPEG
+    image_quality: 92
+    repetition_penalty: 1.1   # break the repetition-loop degeneration on dense pages
+    frequency_penalty: 0.1
+    # Dense broadsheets overwhelm these models (they loop); tile into a grid and
+    # OCR each region. Optimized for word recall (search), not perfect layout.
+    tiling: {enabled: true, cols: 3, rows: 3, overlap: 0.04, max_side: 1600}
+    prompt: |
+      You are an OCR engine for a region cropped from a scanned historical newspaper
+      page. Transcribe ALL legible text exactly as printed, top-to-bottom.
+      Output plain text only — no commentary, no markdown fences.
+    max_tokens: 4096
+    temperature: 0.0
+
+  glm-ocr:
+    mode: vlm_chat
+    # GPU 1 only (production GLM owns GPU 0). For a big re-run you can add a
+    # second endpoint here as a list to load-balance across both 5090s — but
+    # that requires pausing production (systemctl --user stop vllm.service).
+    base_url: http://localhost:4003/v1
+    model: GLM-OCR
+    image_fmt: JPEG
+    image_quality: 92
+    repetition_penalty: 1.1
+    frequency_penalty: 0.1
+    tiling: {enabled: true, cols: 3, rows: 3, overlap: 0.04, max_side: 1600}
+    prompt: |
+      You are an OCR engine for a region cropped from a scanned historical newspaper
+      page. Transcribe ALL legible text exactly as printed, top-to-bottom.
+      Output plain text only.
+    max_tokens: 6144   # pre-1920 broadsheet tiles overflow 4096 (pilot: length:1/9)
+    temperature: 0.0
+
+  hunyuan-ocr:
+    mode: vlm_chat
+    base_url: http://localhost:4004/v1
+    model: HunyuanOCR
+    image_fmt: JPEG
+    image_quality: 92
+    repetition_penalty: 1.1
+    frequency_penalty: 0.1
+    tiling: {enabled: true, cols: 3, rows: 3, overlap: 0.04, max_side: 1600}
+    prompt: |
+      OCR this region cropped from a scanned historical newspaper page.
+      Transcribe all legible text top-to-bottom. Output plain text only.
+    max_tokens: 4096
+    temperature: 0.0
+    want_boxes: true          # Hunyuan is strong at grounded coordinates
+
+  # Secondary SOTA reference: OpenAI GPT-5.5 vision. Triangulates the Claude
+  # ground truth (Claude<->GPT agreement validates the truth; local models get
+  # scored vs both). Needs OPENAI_API_KEY.
+  reference-gpt:
+    mode: openai
+    model: gpt-5.5
+    is_reference: true
+    max_side: 2048
+    image_quality: 90
+    max_tokens: 16000
+    reasoning_effort: low
+    prompt: |
+      You are transcribing a scanned page from a historical American
+      newspaper (Anaheim, California; 1870s-1960s). Transcribe ALL legible text exactly as printed,
+      following natural reading order — each column top-to-bottom before moving
+      to the next column. Include headlines, bylines, ads, and captions.
+      Use [illegible] for text you cannot read. Output ONLY the transcription,
+      with no commentary, preamble, or markdown fences.
+
+  # Tertiary SOTA reference: Google Gemini 3.1 Pro vision. Third independent
+  # ground-truth point — Claude/GPT/Gemini agreement = near-certain truth.
+  reference-gemini:
+    mode: gemini
+    model: gemini-3.1-pro-preview
+    is_reference: true
+    max_side: 2048
+    image_quality: 90
+    prompt: |
+      You are transcribing a scanned page from a historical American
+      newspaper (Anaheim, California; 1870s-1960s). Transcribe ALL legible text exactly as printed,
+      following natural reading order — each column top-to-bottom before moving
+      to the next column. Include headlines, bylines, ads, and captions.
+      Use [illegible] for text you cannot read. Output ONLY the transcription,
+      with no commentary, preamble, or markdown fences.
+
+  # === Round 2: bigger / general-purpose VLMs (the "reads anything" hypothesis) ===
+  # Qwen3-VL-32B-AWQ fits GPU 1 alone (~18-20 GB). Two entries hit the SAME server:
+  # one full-page (does a big model avoid the repetition loop?), one tiled.
+  qwen3vl-32b:
+    mode: vlm_chat
+    base_url: http://localhost:4005/v1
+    model: Qwen3-VL-32B-Instruct-AWQ
+    max_side: 2560
+    image_quality: 92
+    repetition_penalty: 1.05      # cheap insurance against full-page looping
+    prompt: |
+      Transcribe ALL text from this scanned historical newspaper page exactly as
+      printed, in natural reading order (each column top-to-bottom, left to
+      right). Output only the transcription — no commentary, no markdown.
+    max_tokens: 12000
+    temperature: 0.0
+
+  qwen3vl-32b-tiled:
+    mode: vlm_chat
+    base_url: http://localhost:4005/v1
+    model: Qwen3-VL-32B-Instruct-AWQ
+    image_quality: 92
+    repetition_penalty: 1.05
+    tiling: {enabled: true, cols: 3, rows: 3, overlap: 0.04, max_side: 1600}
+    prompt: |
+      Transcribe ALL legible text from this newspaper region, top-to-bottom.
+      Output only the transcription.
+    max_tokens: 4096
+    temperature: 0.0
+
+  olmocr2-7b:
+    mode: vlm_chat
+    base_url: http://localhost:4006/v1
+    model: olmOCR-2-7B-1025-FP8
+    max_side: 2048
+    image_quality: 92
+    repetition_penalty: 1.05
+    prompt: |
+      Transcribe all text from this scanned newspaper page in natural reading
+      order. Output only the transcription as plain text.
+    max_tokens: 12000
+    temperature: 0.0
+
+  paddleocr-vl-15:
+    mode: vlm_chat
+    base_url: http://localhost:4007/v1
+    model: PaddleOCR-VL-1.5
+    image_quality: 92
+    repetition_penalty: 1.1
+    frequency_penalty: 0.1
+    tiling: {enabled: true, cols: 3, rows: 3, overlap: 0.04, max_side: 1600}
+    prompt: |
+      You are an OCR engine for a region cropped from a scanned historical newspaper
+      page. Transcribe ALL legible text exactly as printed, top-to-bottom.
+      Output plain text only.
+    max_tokens: 4096
+    temperature: 0.0
+
+  # 72B needs BOTH 5090s (tensor-parallel) — production GLM on GPU 0 paused for this.
+  qwen25vl-72b:
+    mode: vlm_chat
+    base_url: http://localhost:4008/v1
+    model: Qwen2.5-VL-72B-Instruct-AWQ
+    max_side: 2560
+    image_quality: 92
+    repetition_penalty: 1.05
+    prompt: |
+      Transcribe ALL text from this scanned historical newspaper page exactly as
+      printed, in natural reading order (each column top-to-bottom, left to
+      right). Output only the transcription — no commentary, no markdown.
+    max_tokens: 12000
+    temperature: 0.0
+
+  # === Round 3: user-requested omni / flash VLMs ===
+  # GLM-4.6V-Flash (10.3B) fits GPU 1 in bf16. Full-page first.
+  glm46v-flash:
+    mode: vlm_chat
+    base_url: http://localhost:4009/v1
+    model: GLM-4.6V-Flash
+    image_quality: 92
+    repetition_penalty: 1.1
+    frequency_penalty: 0.1
+    tiling: {enabled: true, cols: 3, rows: 3, overlap: 0.04, max_side: 1600}
+    prompt: |
+      You are an OCR engine for a region cropped from a scanned historical newspaper
+      page. Transcribe ALL legible text exactly as printed, top-to-bottom.
+      Output plain text only.
+    max_tokens: 4096
+    temperature: 0.0
+
+  # Qwen3-Omni-30B-A3B (35B MoE, 3B active) — no public quant; bf16 is 70 GB
+  # (> 64 GB), so served FP8 on-the-fly across BOTH GPUs. MoE → fast. Phase B.
+  qwen3-omni-30b:
+    mode: vlm_chat
+    base_url: http://localhost:4010/v1
+    model: Qwen3-Omni-30B-A3B-Instruct
+    max_side: 2560
+    image_quality: 92
+    repetition_penalty: 1.05
+    prompt: |
+      Transcribe ALL text from this scanned historical newspaper page exactly as
+      printed, in natural reading order. Output only the transcription.
+    max_tokens: 12000
+    temperature: 0.0
+
+  # Nemotron-3-Nano-Omni-30B-A3B (FP8, ~30 GB) across BOTH GPUs. Reasoning omni
+  # model — vLLM 0.22.1 support unproven; benchmark skips it if it won't load.
+  nemotron-omni-30b:
+    mode: vlm_chat
+    base_url: http://localhost:4011/v1
+    model: Nemotron-3-Nano-Omni-30B-A3B-Reasoning-FP8
+    max_side: 2560
+    image_quality: 92
+    repetition_penalty: 1.05
+    prompt: |
+      Transcribe ALL text from this scanned historical newspaper page exactly as
+      printed, in natural reading order. Output only the transcription, with no
+      reasoning or commentary.
+    max_tokens: 12000
+    temperature: 0.0
+
+  # === Round 4: more doc-OCR VLMs (vLLM-servable, GPU 1) ===
+  paddleocr-vl-16:
+    mode: vlm_chat
+    base_url: http://localhost:4012/v1
+    model: PaddleOCR-VL-1.6
+    image_quality: 92
+    repetition_penalty: 1.1
+    frequency_penalty: 0.1
+    tiling: {enabled: true, cols: 3, rows: 3, overlap: 0.04, max_side: 1600}
+    prompt: |
+      You are an OCR engine for a region cropped from a scanned historical newspaper
+      page. Transcribe ALL legible text exactly as printed, top-to-bottom.
+      Output plain text only.
+    max_tokens: 4096
+    temperature: 0.0
+
+  # dots.ocr (3B) — end-to-end layout+OCR. Try full-page first (it does its own
+  # layout); add a tiled entry if it loops.
+  # dots.ocr is a LAYOUT model: with its native prompt it emits a JSON array of
+  # blocks (bbox/category/text) in reading order; we parse out the text fields.
+  dots-ocr:
+    mode: vlm_chat
+    base_url: http://localhost:4013/v1
+    model: dots.ocr
+    max_side: 2560
+    image_quality: 92
+    parse: dots_json
+    prompt: |
+      Please output the layout information from this image, including each
+      layout element's bbox, its category, and the corresponding text content
+      within the bbox, in natural reading order.
+    max_tokens: 13000   # within server MAXLEN 16384 minus image/prompt tokens
+    temperature: 0.0
+
+  # Surya 2 — layout-aware OCR (column/article detection + reading order), runs as
+  # a local library, not vLLM. Tests whether real layout beats the 3x3 grid.
+  surya2:
+    mode: surya
+    venv: /home/revoked/.agent/surya-venv
+    is_local_lib: true
+    note: "run via scripts/surya_ocr.py on GPU 1 when free"
+
+  # MinerU2.5 — top OmniDocBench accuracy. Runs as a toolchain that calls a
+  # vLLM-served VLM. Optional; requires `mineru` installed where this runs.
+  mineru:
+    mode: mineru
+    server_url: http://localhost:8000      # vLLM server hosting the MinerU2.5 VLM
+    backend: vlm-http-client
+    enabled: false            # flip to true once MinerU is set up (see serve/)
+
+  # Claude Opus 4.8 vision — the GROUND-TRUTH reference. Not a candidate to run
+  # over the whole corpus (cost); used on the benchmark sample to score every
+  # local model on real accuracy (WER / char-similarity). Needs ANTHROPIC_API_KEY.
+  reference-claude:
+    mode: anthropic
+    model: claude-opus-4-8
+    is_reference: true
+    max_side: 2400
+    image_quality: 90
+    max_tokens: 16000
+    prompt: |
+      You are transcribing a scanned page from a historical American
+      newspaper (Anaheim, California; 1870s-1960s). Transcribe ALL legible text exactly as printed,
+      following natural reading order — each column top-to-bottom before moving
+      to the next column. Include headlines, bylines, ads, and captions.
+      Use [illegible] for text you cannot read. Output ONLY the transcription,
+      with no commentary, preamble, or markdown fences.
