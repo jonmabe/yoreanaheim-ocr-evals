@@ -1,7 +1,7 @@
 """Scan a PDF corpus: count PDFs, total PAGES (the real OCR cost driver), and
 size, broken down by publication and decade. Saves JSON for the report.
 
-  python scripts/scan_corpus.py "C:/Projects/YoreAnaheim/dl-c6e6b6c1de78"
+  python scripts/scan_corpus.py "D:/My Files/Projects/YoreAnaheim-2026/dl-c6e6b6c1de78"
 """
 from __future__ import annotations
 import sys
@@ -34,7 +34,7 @@ def work(p_str):
 
 def main():
     root = Path(sys.argv[1] if len(sys.argv) > 1
-               else "C:/Projects/YoreAnaheim/dl-c6e6b6c1de78")
+               else "D:/My Files/Projects/YoreAnaheim-2026/dl-c6e6b6c1de78")
     pdfs = sorted(root.rglob("*.pdf"))
     print(f"Scanning {len(pdfs)} PDFs under {root} ...")
 
